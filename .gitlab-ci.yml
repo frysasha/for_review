@@ -1,0 +1,24 @@
+stages:
+  - test
+
+ui_tests:
+  image: python:3.9
+  stage: test
+  services:
+    - name: selenium/standalone-chrome:latest
+      alias: selenium
+  before_script:
+    - pip install -r requirements.txt
+  script:
+        - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub pytest -s -v --color=yes 
+          --testit --tmsTestRunId=${TEST_RUN_ID} --tmsUrl=${URL} --tmsPrivateToken=${PRIVATE_TOKEN} 
+          --tmsConfigurationId="6457f69a-8e2b-4a6e-a90f-7c051df200ce" --tmsTestRunName=Biglion_gitlab --junitxml=junit.xml
+  allow_failure: true
+  when: manual
+  artifacts:
+    when: always
+    paths:
+      - junit.xml
+    reports:
+      junit: junit.xml
+    expire_in: 1 day
